@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MailMind — Subscrição confirmada!</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0d1b2a;
+    --navy-mid: #1a2f45;
+    --navy-light: #243b55;
+    --gold: #c9a84c;
+    --gold-light: #e8c96a;
+    --off-white: #f4f1eb;
+    --white: #ffffff;
+    --text-muted: #8a9bb0;
+    --border: rgba(255,255,255,0.08);
+    --green: #52c97a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--navy);
+    color: var(--off-white);
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+  }
+
+  nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 60px;
+    border-bottom: 0.5px solid var(--border);
+  }
+
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px; font-weight: 700; color: var(--white);
+    text-decoration: none;
+  }
+
+  .logo span { color: var(--gold); }
+
+  .main {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    padding: 60px 24px;
+  }
+
+  .success-card {
+    background: var(--navy-mid);
+    border: 0.5px solid var(--border);
+    border-radius: 12px;
+    padding: 56px 48px;
+    max-width: 580px; width: 100%;
+    text-align: center;
+    animation: fadeUp 0.7s ease both;
+  }
+
+  .check-circle {
+    width: 72px; height: 72px; border-radius: 50%;
+    background: rgba(82,201,122,0.12);
+    border: 0.5px solid rgba(82,201,122,0.3);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 28px;
+  }
+
+  .check-circle svg {
+    width: 32px; height: 32px;
+    stroke: var(--green); fill: none; stroke-width: 2;
+    stroke-dasharray: 50;
+    stroke-dashoffset: 50;
+    animation: drawCheck 0.6s 0.4s ease forwards;
+  }
+
+  @keyframes drawCheck {
+    to { stroke-dashoffset: 0; }
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 34px; font-weight: 700; color: var(--white);
+    margin-bottom: 14px; line-height: 1.15;
+  }
+
+  .subtitle {
+    font-size: 16px; color: var(--text-muted); font-weight: 300;
+    line-height: 1.7; margin-bottom: 36px;
+  }
+
+  .details-box {
+    background: var(--navy);
+    border: 0.5px solid var(--border);
+    border-radius: 8px; padding: 20px 24px;
+    margin-bottom: 32px; text-align: left;
+  }
+
+  .detail-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 0;
+    border-bottom: 0.5px solid var(--border);
+    font-size: 13px;
+  }
+
+  .detail-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .detail-row:first-child { padding-top: 0; }
+
+  .detail-label { color: var(--text-muted); }
+  .detail-value { color: var(--off-white); font-weight: 500; }
+  .detail-value.green { color: var(--green); }
+  .detail-value.gold { color: var(--gold); }
+
+  .next-steps {
+    margin-bottom: 36px; text-align: left;
+  }
+
+  .next-title {
+    font-size: 13px; font-weight: 500; color: var(--text-muted);
+    letter-spacing: 0.08em; text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .step-item {
+    display: flex; gap: 14px; align-items: flex-start;
+    margin-bottom: 14px;
+  }
+
+  .step-dot {
+    width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+    background: rgba(201,168,76,0.1);
+    border: 0.5px solid rgba(201,168,76,0.25);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 500; color: var(--gold);
+    font-family: 'Playfair Display', serif;
+  }
+
+  .step-text { font-size: 13px; color: var(--text-muted); line-height: 1.6; padding-top: 4px; }
+  .step-text strong { color: var(--off-white); font-weight: 500; }
+
+  .btn-primary {
+    display: inline-block;
+    background: var(--gold); color: var(--navy);
+    padding: 14px 36px; border-radius: 4px;
+    font-size: 15px; font-weight: 500;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.15s;
+    margin-bottom: 14px; width: 100%;
+  }
+
+  .btn-primary:hover { background: var(--gold-light); transform: translateY(-1px); }
+
+  .btn-ghost {
+    display: inline-block;
+    color: var(--text-muted); font-size: 13px;
+    text-decoration: none; transition: color 0.2s;
+  }
+
+  .btn-ghost:hover { color: var(--off-white); }
+
+  .sub-id {
+    font-size: 11px; color: var(--text-muted);
+    margin-top: 20px; font-family: monospace;
+  }
+
+  footer {
+    text-align: center; padding: 28px;
+    font-size: 12px; color: var(--text-muted);
+    border-top: 0.5px solid var(--border);
+  }
+
+  footer a { color: var(--text-muted); text-decoration: none; margin: 0 10px; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(28px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 600px) {
+    nav { padding: 18px 20px; }
+    .success-card { padding: 36px 24px; }
+    h1 { font-size: 28px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="mailmind-landing.html" class="logo">Mail<span>Mind</span></a>
+</nav>
+
+<div class="main">
+  <div class="success-card">
+
+    <div class="check-circle">
+      <svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>
+    </div>
+
+    <h1>Subscrição<br>confirmada!</h1>
+    <p class="subtitle">Bem-vindo ao MailMind. O seu período de teste gratuito de 14 dias começa hoje — sem qualquer cobrança agora.</p>
+
+    <div class="details-box">
+      <div class="detail-row">
+        <span class="detail-label">Plano</span>
+        <span class="detail-value gold" id="plan-display">Pro</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Período de teste</span>
+        <span class="detail-value green">14 dias grátis</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Primeiro pagamento</span>
+        <span class="detail-value" id="first-payment">—</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Método de pagamento</span>
+        <span class="detail-value">PayPal</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Renovação automática</span>
+        <span class="detail-value">Anual · cancela a qualquer momento</span>
+      </div>
+    </div>
+
+    <div class="next-steps">
+      <div class="next-title">Próximos passos</div>
+      <div class="step-item">
+        <div class="step-dot">1</div>
+        <div class="step-text"><strong>Verifique o seu email</strong> — enviámos um link de confirmação e as credenciais de acesso.</div>
+      </div>
+      <div class="step-item">
+        <div class="step-dot">2</div>
+        <div class="step-text"><strong>Ligue a sua conta de email</strong> — Gmail ou Outlook em menos de 2 minutos.</div>
+      </div>
+      <div class="step-item">
+        <div class="step-dot">3</div>
+        <div class="step-text"><strong>O MailMind aprende o seu estilo</strong> — nas primeiras 24h analisa os seus padrões e começa a trabalhar.</div>
+      </div>
+    </div>
+
+    <a href="#" class="btn-primary">Aceder ao dashboard →</a>
+    <br>
+    <a href="mailmind-landing.html" class="btn-ghost">← Voltar ao site</a>
+
+    <div class="sub-id" id="sub-id"></div>
+
+  </div>
+</div>
+
+<footer>
+  <a href="#">Suporte</a>
+  <a href="#">Privacidade</a>
+  <a href="#">Termos</a>
+  <br><br>
+  © 2026 MailMind. Todos os direitos reservados.
+</footer>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const subId = params.get('sub');
+  const plano = params.get('plano') || 'pro';
+
+  const planNames = { pro: 'Pro — €22/mês', equipa: 'Equipa — €38/mês' };
+  document.getElementById('plan-display').textContent = planNames[plano] || 'Pro';
+
+  if (subId) {
+    document.getElementById('sub-id').textContent = 'ID de subscrição: ' + subId;
+  }
+
+  const trialEnd = new Date();
+  trialEnd.setDate(trialEnd.getDate() + 14);
+  const options = { day: 'numeric', month: 'long', year: 'numeric' };
+  document.getElementById('first-payment').textContent = trialEnd.toLocaleDateString('pt-PT', options);
+</script>
+
+</body>
+</html>

@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MailMind — Checkout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<!-- PayPal SDK — substitui CLIENT_ID pelo teu ID do PayPal Developer Dashboard -->
+<script src="https://www.paypal.com/sdk/js?client-id=CLIENT_ID&currency=EUR&intent=subscription&vault=true"></script>
+<style>
+  :root {
+    --navy: #0d1b2a;
+    --navy-mid: #1a2f45;
+    --navy-light: #243b55;
+    --gold: #c9a84c;
+    --gold-light: #e8c96a;
+    --off-white: #f4f1eb;
+    --white: #ffffff;
+    --text-muted: #8a9bb0;
+    --border: rgba(255,255,255,0.08);
+    --green: #52c97a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--navy);
+    color: var(--off-white);
+    min-height: 100vh;
+  }
+
+  nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 60px;
+    border-bottom: 0.5px solid var(--border);
+  }
+
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px; font-weight: 700; color: var(--white);
+    text-decoration: none;
+  }
+
+  .logo span { color: var(--gold); }
+
+  .secure-badge {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 13px; color: var(--text-muted);
+  }
+
+  .secure-badge svg { width: 16px; height: 16px; stroke: var(--green); fill: none; stroke-width: 1.5; }
+
+  .checkout-wrap {
+    max-width: 960px; margin: 48px auto; padding: 0 24px;
+    display: grid; grid-template-columns: 1fr 400px; gap: 32px;
+  }
+
+  /* LEFT — form */
+  .checkout-form { display: flex; flex-direction: column; gap: 28px; }
+
+  .form-block {
+    background: var(--navy-mid);
+    border: 0.5px solid var(--border);
+    border-radius: 8px; padding: 28px 28px;
+  }
+
+  .block-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px; font-weight: 500; color: var(--white);
+    margin-bottom: 20px;
+    display: flex; align-items: center; gap: 10px;
+  }
+
+  .block-num {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: rgba(201,168,76,0.15);
+    border: 0.5px solid rgba(201,168,76,0.3);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px; font-weight: 500; color: var(--gold);
+  }
+
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .field-row.single { grid-template-columns: 1fr; }
+
+  .field { display: flex; flex-direction: column; gap: 7px; }
+
+  .field label {
+    font-size: 12px; font-weight: 500; color: var(--text-muted);
+    letter-spacing: 0.04em; text-transform: uppercase;
+  }
+
+  .field input, .field select {
+    background: var(--navy);
+    border: 0.5px solid rgba(255,255,255,0.12);
+    border-radius: 4px;
+    color: var(--off-white);
+    font-size: 14px; font-family: 'DM Sans', sans-serif;
+    padding: 11px 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    appearance: none;
+  }
+
+  .field input::placeholder { color: var(--text-muted); }
+  .field input:focus, .field select:focus { border-color: rgba(201,168,76,0.5); }
+
+  .field select { cursor: pointer; }
+
+  .trial-note {
+    background: rgba(82,201,122,0.08);
+    border: 0.5px solid rgba(82,201,122,0.2);
+    border-radius: 4px; padding: 12px 16px;
+    font-size: 13px; color: #7de8a4; line-height: 1.5;
+    display: flex; gap: 10px; align-items: flex-start;
+  }
+
+  .trial-note svg { width: 16px; height: 16px; stroke: var(--green); fill: none; stroke-width: 1.5; flex-shrink: 0; margin-top: 1px; }
+
+  .paypal-section { margin-top: 4px; }
+
+  .paypal-divider {
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 18px;
+  }
+
+  .paypal-divider hr { flex: 1; border: none; border-top: 0.5px solid var(--border); }
+  .paypal-divider span { font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+
+  #paypal-button-container { min-height: 50px; }
+
+  .paypal-loading {
+    background: #0070ba;
+    border-radius: 4px; height: 50px;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 14px; font-weight: 500;
+    gap: 10px; cursor: pointer; transition: background 0.2s;
+  }
+
+  .paypal-loading:hover { background: #005ea6; }
+
+  .paypal-logo {
+    font-size: 18px; font-weight: 700;
+    font-style: italic;
+  }
+
+  .paypal-logo .pay { color: #009cde; }
+  .paypal-logo .pal { color: #012169; background: white; padding: 1px 4px; border-radius: 2px; }
+
+  /* RIGHT — order summary */
+  .order-summary {
+    position: sticky; top: 24px; height: fit-content;
+  }
+
+  .summary-card {
+    background: var(--navy-mid);
+    border: 0.5px solid var(--border);
+    border-radius: 8px; overflow: hidden;
+  }
+
+  .summary-header {
+    padding: 20px 24px;
+    border-bottom: 0.5px solid var(--border);
+    background: var(--navy-light);
+  }
+
+  .summary-header h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px; font-weight: 500; color: var(--white);
+    margin-bottom: 4px;
+  }
+
+  .summary-header p { font-size: 13px; color: var(--text-muted); }
+
+  .summary-body { padding: 20px 24px; }
+
+  .summary-row {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 14px;
+  }
+
+  .summary-row:last-child { margin-bottom: 0; }
+
+  .summary-label { font-size: 13px; color: var(--text-muted); }
+  .summary-value { font-size: 13px; color: var(--off-white); font-weight: 500; }
+  .summary-value.green { color: var(--green); }
+  .summary-value.gold { color: var(--gold); }
+
+  .summary-divider { border: none; border-top: 0.5px solid var(--border); margin: 16px 0; }
+
+  .summary-total-label { font-size: 14px; font-weight: 500; color: var(--off-white); }
+  .summary-total-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px; font-weight: 700; color: var(--white);
+  }
+
+  .summary-total-value sup { font-size: 14px; color: var(--gold); font-family: 'DM Sans', sans-serif; font-weight: 300; vertical-align: super; }
+
+  .features-list {
+    margin-top: 20px; padding-top: 20px;
+    border-top: 0.5px solid var(--border);
+    display: flex; flex-direction: column; gap: 10px;
+  }
+
+  .feat-item {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 12px; color: var(--text-muted);
+  }
+
+  .feat-item svg { width: 14px; height: 14px; stroke: var(--green); fill: none; stroke-width: 2; flex-shrink: 0; }
+
+  .trust-badges {
+    margin-top: 20px; padding-top: 20px;
+    border-top: 0.5px solid var(--border);
+    display: flex; flex-direction: column; gap: 10px;
+  }
+
+  .trust-item {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 12px; color: var(--text-muted);
+  }
+
+  .trust-item svg { width: 14px; height: 14px; stroke: var(--text-muted); fill: none; stroke-width: 1.5; flex-shrink: 0; }
+
+  footer {
+    text-align: center; padding: 40px 24px;
+    font-size: 12px; color: var(--text-muted);
+    border-top: 0.5px solid var(--border);
+    margin-top: 40px;
+  }
+
+  footer a { color: var(--text-muted); text-decoration: none; margin: 0 12px; }
+  footer a:hover { color: var(--off-white); }
+
+  @media (max-width: 768px) {
+    nav { padding: 18px 20px; }
+    .checkout-wrap { grid-template-columns: 1fr; }
+    .order-summary { position: static; }
+    .field-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="mailmind-landing.html" class="logo">Mail<span>Mind</span></a>
+  <div class="secure-badge">
+    <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    Pagamento seguro
+  </div>
+</nav>
+
+<div class="checkout-wrap">
+
+  <!-- LEFT -->
+  <div class="checkout-form">
+
+    <!-- Conta -->
+    <div class="form-block">
+      <div class="block-title">
+        <span class="block-num">1</span>
+        Criar conta
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 14px;">
+        <div class="field-row">
+          <div class="field">
+            <label>Nome</label>
+            <input type="text" placeholder="Ana Silva">
+          </div>
+          <div class="field">
+            <label>Apelido</label>
+            <input type="text" placeholder="Santos">
+          </div>
+        </div>
+        <div class="field-row single">
+          <div class="field">
+            <label>Email</label>
+            <input type="email" placeholder="ana@empresa.com" id="userEmail">
+          </div>
+        </div>
+        <div class="field-row single">
+          <div class="field">
+            <label>Palavra-passe</label>
+            <input type="password" placeholder="Mínimo 8 caracteres">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Faturação -->
+    <div class="form-block">
+      <div class="block-title">
+        <span class="block-num">2</span>
+        Dados de faturação
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 14px;">
+        <div class="field-row single">
+          <div class="field">
+            <label>Nome da empresa (opcional)</label>
+            <input type="text" placeholder="MailMind Lda.">
+          </div>
+        </div>
+        <div class="field-row single">
+          <div class="field">
+            <label>NIF (opcional)</label>
+            <input type="text" placeholder="PT 123456789">
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>País</label>
+            <select>
+              <option value="pt">Portugal</option>
+              <option value="br">Brasil</option>
+              <option value="es">Espanha</option>
+              <option value="fr">França</option>
+              <option value="de">Alemanha</option>
+              <option value="gb">Reino Unido</option>
+              <option value="other">Outro</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Código postal</label>
+            <input type="text" placeholder="1000-001">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pagamento -->
+    <div class="form-block">
+      <div class="block-title">
+        <span class="block-num">3</span>
+        Pagamento via PayPal
+      </div>
+
+      <div class="trial-note" style="margin-bottom: 20px;">
+        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <span>14 dias grátis — não será cobrado hoje. A subscrição inicia automaticamente no final do período de teste e pode cancelar a qualquer momento.</span>
+      </div>
+
+      <div class="paypal-section">
+        <div class="paypal-divider">
+          <hr><span>Pagar com</span><hr>
+        </div>
+        <!-- O botão PayPal real será injetado aqui pelo SDK -->
+        <div id="paypal-button-container"></div>
+        <!-- Fallback visual enquanto o SDK carrega -->
+        <div class="paypal-loading" id="paypal-fallback" onclick="this.style.display='none'">
+          <span style="font-size:13px; font-style:italic; font-weight:700; color:white;">
+            <span style="color:#009cde;">Pay</span><span style="background:white; color:#012169; padding:1px 5px; border-radius:2px; margin-left:1px;">Pal</span>
+          </span>
+          <span style="font-size:13px;">— Clique para pagar com PayPal</span>
+        </div>
+      </div>
+
+      <p style="font-size: 11px; color: var(--text-muted); margin-top: 14px; line-height: 1.6;">
+        Ao prosseguir aceita os nossos <a href="#" style="color: var(--gold); text-decoration: none;">Termos de Serviço</a> e <a href="#" style="color: var(--gold); text-decoration: none;">Política de Privacidade</a>. Será redirecionado para o PayPal para completar o pagamento em segurança.
+      </p>
+    </div>
+
+  </div>
+
+  <!-- RIGHT — summary -->
+  <div class="order-summary">
+    <div class="summary-card">
+      <div class="summary-header">
+        <h3 id="plan-name">Plano Pro</h3>
+        <p id="plan-desc">Faturado anualmente</p>
+      </div>
+      <div class="summary-body">
+        <div class="summary-row">
+          <span class="summary-label">Preço mensal</span>
+          <span class="summary-value" id="plan-price">€22/mês</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Faturado como</span>
+          <span class="summary-value" id="plan-annual">€264/ano</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Período de teste</span>
+          <span class="summary-value green">14 dias grátis</span>
+        </div>
+        <hr class="summary-divider">
+        <div class="summary-row">
+          <span class="summary-total-label">Hoje paga</span>
+          <span class="summary-total-value"><sup>€</sup>0</span>
+        </div>
+
+        <div class="features-list">
+          <div class="feat-item">
+            <svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>
+            Emails ilimitados com IA
+          </div>
+          <div class="feat-item">
+            <svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>
+            Respostas no seu tom de voz
+          </div>
+          <div class="feat-item">
+            <svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>
+            Follow-ups automáticos
+          </div>
+          <div class="feat-item">
+            <svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>
+            Gestão de subscrições
+          </div>
+          <div class="feat-item" id="feat-extra" style="display:none">
+            <svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>
+            Inbox partilhado com IA
+          </div>
+        </div>
+
+        <div class="trust-badges">
+          <div class="trust-item">
+            <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Pagamento 100% seguro via PayPal
+          </div>
+          <div class="trust-item">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+            Cancela a qualquer momento
+          </div>
+          <div class="trust-item">
+            <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+            Dados protegidos e encriptados
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <a href="mailmind-landing.html">← Voltar ao site</a>
+  <a href="#">Privacidade</a>
+  <a href="#">Termos</a>
+  <a href="#">Suporte</a>
+  <br><br>
+  © 2026 MailMind. Todos os direitos reservados.
+</footer>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const plano = params.get('plano') || 'pro';
+
+  const plans = {
+    pro: {
+      name: 'Plano Pro',
+      desc: 'Faturado anualmente',
+      price: '€22/mês',
+      annual: '€264/ano',
+      planId: 'P-PRO_PLAN_ID', // Substitui pelo Plan ID do PayPal
+      featExtra: false
+    },
+    equipa: {
+      name: 'Plano Equipa',
+      desc: 'Por utilizador · faturado anualmente',
+      price: '€38/mês',
+      annual: '€456/ano',
+      planId: 'P-TEAM_PLAN_ID', // Substitui pelo Plan ID do PayPal
+      featExtra: true
+    }
+  };
+
+  const p = plans[plano] || plans.pro;
+  document.getElementById('plan-name').textContent = p.name;
+  document.getElementById('plan-desc').textContent = p.desc;
+  document.getElementById('plan-price').textContent = p.price;
+  document.getElementById('plan-annual').textContent = p.annual;
+  if (p.featExtra) document.getElementById('feat-extra').style.display = 'flex';
+
+  // PayPal Subscription Button
+  // Nota: Para funcionar em produção precisas de:
+  // 1. Conta PayPal Business em developer.paypal.com
+  // 2. Criar os planos de subscrição no dashboard
+  // 3. Substituir CLIENT_ID no <script> do SDK e os planId acima
+
+  if (window.paypal) {
+    document.getElementById('paypal-fallback').style.display = 'none';
+
+    paypal.Buttons({
+      style: {
+        shape: 'rect',
+        color: 'blue',
+        layout: 'vertical',
+        label: 'subscribe'
+      },
+      createSubscription: function(data, actions) {
+        return actions.subscription.create({
+          plan_id: p.planId,
+          application_context: {
+            shipping_preference: 'NO_SHIPPING'
+          }
+        });
+      },
+      onApprove: function(data, actions) {
+        // Redireciona para página de sucesso com o ID da subscrição
+        window.location.href = 'sucesso.html?sub=' + data.subscriptionID + '&plano=' + plano;
+      },
+      onError: function(err) {
+        console.error('PayPal error:', err);
+        alert('Ocorreu um erro com o PayPal. Por favor tenta novamente ou contacta o suporte.');
+      },
+      onCancel: function() {
+        console.log('Pagamento cancelado pelo utilizador.');
+      }
+    }).render('#paypal-button-container');
+  }
+</script>
+</body>
+</html>

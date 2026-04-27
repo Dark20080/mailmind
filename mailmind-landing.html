@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MailMind — AI Email Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0d1b2a;
+    --navy-mid: #1a2f45;
+    --navy-light: #243b55;
+    --blue: #1e6fb5;
+    --blue-bright: #2a8fe0;
+    --gold: #c9a84c;
+    --gold-light: #e8c96a;
+    --off-white: #f4f1eb;
+    --white: #ffffff;
+    --text-muted: #8a9bb0;
+    --border: rgba(255,255,255,0.08);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--navy);
+    color: var(--off-white);
+    overflow-x: hidden;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 60px;
+    background: rgba(13, 27, 42, 0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 0.5px solid var(--border);
+  }
+
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px; font-weight: 700;
+    color: var(--white);
+    letter-spacing: -0.5px;
+  }
+
+  .logo span { color: var(--gold); }
+
+  .nav-links {
+    display: flex; align-items: center; gap: 36px;
+    list-style: none;
+  }
+
+  .nav-links a {
+    color: var(--text-muted); text-decoration: none;
+    font-size: 14px; font-weight: 400;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--off-white); }
+
+  .nav-cta {
+    background: var(--gold);
+    color: var(--navy) !important;
+    padding: 9px 22px;
+    border-radius: 4px;
+    font-weight: 500 !important;
+    font-size: 13px !important;
+    transition: background 0.2s !important;
+  }
+
+  .nav-cta:hover { background: var(--gold-light) !important; color: var(--navy) !important; }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 120px 60px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse at 60% 40%, rgba(0,0,0,0.6) 0%, transparent 70%);
+  }
+
+  .hero-glow {
+    position: absolute; top: -200px; right: -200px;
+    width: 700px; height: 700px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(30, 111, 181, 0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(201, 168, 76, 0.12);
+    border: 0.5px solid rgba(201, 168, 76, 0.3);
+    color: var(--gold);
+    font-size: 12px; font-weight: 500;
+    padding: 6px 14px; border-radius: 2px;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    margin-bottom: 28px;
+    width: fit-content;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .hero-tag::before {
+    content: '';
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--gold);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(44px, 6vw, 76px);
+    font-weight: 700;
+    line-height: 1.08;
+    color: var(--white);
+    max-width: 780px;
+    margin-bottom: 28px;
+    animation: fadeUp 0.7s 0.1s ease both;
+  }
+
+  .hero h1 em {
+    font-style: italic;
+    color: var(--gold);
+  }
+
+  .hero p {
+    font-size: 18px; font-weight: 300; line-height: 1.7;
+    color: var(--text-muted);
+    max-width: 520px;
+    margin-bottom: 44px;
+    animation: fadeUp 0.7s 0.2s ease both;
+  }
+
+  .hero-actions {
+    display: flex; align-items: center; gap: 20px;
+    animation: fadeUp 0.7s 0.3s ease both;
+  }
+
+  .btn-primary {
+    background: var(--gold);
+    color: var(--navy);
+    padding: 14px 32px;
+    border-radius: 4px;
+    font-size: 15px; font-weight: 500;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.15s;
+    display: inline-block;
+  }
+
+  .btn-primary:hover { background: var(--gold-light); transform: translateY(-1px); }
+
+  .btn-ghost {
+    color: var(--off-white);
+    font-size: 14px; font-weight: 400;
+    text-decoration: none;
+    display: flex; align-items: center; gap: 8px;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+  }
+
+  .btn-ghost:hover { opacity: 1; }
+
+  .btn-ghost svg { width: 18px; height: 18px; }
+
+  .hero-stats {
+    display: flex; gap: 48px; margin-top: 72px;
+    border-top: 0.5px solid var(--border);
+    padding-top: 36px;
+    animation: fadeUp 0.7s 0.4s ease both;
+  }
+
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px; font-weight: 700;
+    color: var(--white);
+    margin-bottom: 4px;
+  }
+
+  .stat-num span { color: var(--gold); }
+
+  .stat-label {
+    font-size: 13px; color: var(--text-muted); font-weight: 400;
+  }
+
+  /* EMAIL PREVIEW */
+  .inbox-preview {
+    position: absolute; right: 5%; top: 50%; transform: translateY(-50%);
+    width: 420px;
+    background: var(--navy-mid);
+    border: 0.5px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    animation: fadeLeft 0.9s 0.4s ease both;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.4);
+  }
+
+  .inbox-header {
+    background: var(--navy-light);
+    padding: 14px 18px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 0.5px solid var(--border);
+  }
+
+  .inbox-title { font-size: 13px; font-weight: 500; color: var(--off-white); }
+  .inbox-badge { background: var(--gold); color: var(--navy); font-size: 10px; font-weight: 500; padding: 2px 8px; border-radius: 2px; }
+
+  .inbox-item {
+    padding: 14px 18px;
+    border-bottom: 0.5px solid var(--border);
+    display: flex; gap: 12px; align-items: flex-start;
+    transition: background 0.15s;
+  }
+
+  .inbox-item:hover { background: rgba(255,255,255,0.02); }
+  .inbox-item.active { background: rgba(30,111,181,0.1); border-left: 2px solid var(--blue-bright); }
+
+  .priority-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+  .p-red { background: #e05252; }
+  .p-amber { background: var(--gold); }
+  .p-green { background: #52c97a; }
+
+  .inbox-sender { font-size: 12px; font-weight: 500; color: var(--off-white); margin-bottom: 2px; }
+  .inbox-subject { font-size: 11px; color: var(--text-muted); }
+
+  .ai-chip {
+    background: rgba(42, 143, 224, 0.15);
+    border: 0.5px solid rgba(42,143,224,0.3);
+    color: #7dc3f0;
+    font-size: 10px; font-weight: 500;
+    padding: 2px 8px; border-radius: 2px;
+    margin-left: auto; flex-shrink: 0;
+    letter-spacing: 0.04em;
+  }
+
+  .ai-summary-bar {
+    background: rgba(30,111,181,0.12);
+    border-top: 0.5px solid rgba(30,111,181,0.2);
+    padding: 12px 18px;
+    font-size: 11px; color: #7dc3f0; line-height: 1.5;
+  }
+
+  /* SECTIONS */
+  section { padding: 100px 60px; }
+
+  .section-tag {
+    font-size: 11px; font-weight: 500; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--gold);
+    margin-bottom: 16px;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 4vw, 48px);
+    font-weight: 700; color: var(--white);
+    line-height: 1.15; margin-bottom: 20px;
+  }
+
+  .section-sub {
+    font-size: 17px; color: var(--text-muted); font-weight: 300;
+    max-width: 520px; line-height: 1.7;
+  }
+
+  /* FEATURES */
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 0.5px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-top: 64px;
+  }
+
+  .feature-card {
+    background: var(--navy);
+    padding: 40px 36px;
+    transition: background 0.2s;
+  }
+
+  .feature-card:hover { background: var(--navy-mid); }
+
+  .feature-icon {
+    width: 40px; height: 40px;
+    background: rgba(201,168,76,0.12);
+    border: 0.5px solid rgba(201,168,76,0.25);
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 24px;
+  }
+
+  .feature-icon svg { width: 18px; height: 18px; stroke: var(--gold); fill: none; stroke-width: 1.5; }
+
+  .feature-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px; font-weight: 500; color: var(--white);
+    margin-bottom: 12px;
+  }
+
+  .feature-desc {
+    font-size: 14px; color: var(--text-muted); line-height: 1.7; font-weight: 300;
+  }
+
+  /* HOW IT WORKS */
+  .how-section { background: var(--navy-mid); }
+
+  .steps {
+    display: flex; gap: 0; margin-top: 64px;
+    position: relative;
+  }
+
+  .steps::before {
+    content: '';
+    position: absolute; top: 28px; left: 28px; right: 28px;
+    height: 0.5px; background: var(--border);
+  }
+
+  .step {
+    flex: 1; text-align: center; padding: 0 24px;
+  }
+
+  .step-num {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: var(--navy);
+    border: 0.5px solid rgba(201,168,76,0.3);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 20px; font-weight: 700; color: var(--gold);
+    margin: 0 auto 24px;
+    position: relative; z-index: 1;
+  }
+
+  .step-title {
+    font-size: 16px; font-weight: 500; color: var(--white); margin-bottom: 10px;
+  }
+
+  .step-desc { font-size: 13px; color: var(--text-muted); line-height: 1.6; font-weight: 300; }
+
+  /* PRICING */
+  .pricing-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 20px; margin-top: 64px;
+  }
+
+  .price-card {
+    background: var(--navy-mid);
+    border: 0.5px solid var(--border);
+    border-radius: 8px;
+    padding: 36px 32px;
+    position: relative;
+    transition: border-color 0.2s;
+  }
+
+  .price-card:hover { border-color: rgba(255,255,255,0.15); }
+
+  .price-card.featured {
+    border-color: var(--gold);
+    background: linear-gradient(160deg, rgba(201,168,76,0.05) 0%, var(--navy-mid) 100%);
+  }
+
+  .price-badge {
+    position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+    background: var(--gold); color: var(--navy);
+    font-size: 11px; font-weight: 500; padding: 4px 14px; border-radius: 2px;
+    letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap;
+  }
+
+  .price-tier { font-size: 13px; font-weight: 500; color: var(--text-muted); margin-bottom: 12px; letter-spacing: 0.05em; text-transform: uppercase; }
+
+  .price-amount {
+    font-family: 'Playfair Display', serif;
+    font-size: 44px; font-weight: 700; color: var(--white);
+    margin-bottom: 4px; line-height: 1;
+  }
+
+  .price-amount sup { font-size: 20px; vertical-align: super; color: var(--gold); font-family: 'DM Sans', sans-serif; font-weight: 300; }
+  .price-period { font-size: 13px; color: var(--text-muted); margin-bottom: 28px; }
+
+  .price-features { list-style: none; margin-bottom: 32px; display: flex; flex-direction: column; gap: 12px; }
+
+  .price-features li {
+    font-size: 13px; color: var(--text-muted); font-weight: 300;
+    display: flex; align-items: flex-start; gap: 10px; line-height: 1.4;
+  }
+
+  .price-features li::before {
+    content: '';
+    width: 14px; height: 14px; border-radius: 50%;
+    background: rgba(82, 201, 122, 0.15);
+    border: 0.5px solid rgba(82,201,122,0.4);
+    flex-shrink: 0; margin-top: 1px;
+    background-image: url("data:image/svg+xml,%3Csvg width='8' height='6' viewBox='0 0 8 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 3l2 2 4-4' stroke='%2352c97a' stroke-width='1.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: center;
+  }
+
+  .price-btn {
+    display: block; text-align: center;
+    padding: 13px; border-radius: 4px;
+    font-size: 14px; font-weight: 500;
+    text-decoration: none; transition: all 0.2s;
+  }
+
+  .price-btn.outline {
+    border: 0.5px solid rgba(255,255,255,0.2);
+    color: var(--off-white);
+  }
+
+  .price-btn.outline:hover { border-color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.04); }
+
+  .price-btn.solid {
+    background: var(--gold); color: var(--navy);
+  }
+
+  .price-btn.solid:hover { background: var(--gold-light); }
+
+  /* CTA SECTION */
+  .cta-section {
+    text-align: center;
+    background: var(--navy-mid);
+    border-top: 0.5px solid var(--border);
+    border-bottom: 0.5px solid var(--border);
+    padding: 100px 60px;
+    position: relative; overflow: hidden;
+  }
+
+  .cta-section::before {
+    content: '';
+    position: absolute; top: -200px; left: 50%; transform: translateX(-50%);
+    width: 600px; height: 400px;
+    background: radial-gradient(ellipse, rgba(201,168,76,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .cta-section .section-title { max-width: 600px; margin: 0 auto 16px; }
+  .cta-section .section-sub { margin: 0 auto 40px; text-align: center; }
+
+  .cta-form {
+    display: flex; gap: 10px; max-width: 440px; margin: 0 auto;
+  }
+
+  .cta-input {
+    flex: 1; padding: 13px 18px;
+    background: var(--navy);
+    border: 0.5px solid rgba(255,255,255,0.15);
+    border-radius: 4px;
+    color: var(--off-white);
+    font-size: 14px; font-family: 'DM Sans', sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .cta-input::placeholder { color: var(--text-muted); }
+  .cta-input:focus { border-color: rgba(201,168,76,0.5); }
+
+  .cta-submit {
+    background: var(--gold); color: var(--navy);
+    border: none; cursor: pointer;
+    padding: 13px 24px; border-radius: 4px;
+    font-size: 14px; font-weight: 500;
+    font-family: 'DM Sans', sans-serif;
+    transition: background 0.2s; white-space: nowrap;
+  }
+
+  .cta-submit:hover { background: var(--gold-light); }
+
+  .cta-note { font-size: 12px; color: var(--text-muted); margin-top: 14px; }
+
+  /* FOOTER */
+  footer {
+    padding: 40px 60px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-top: 0.5px solid var(--border);
+  }
+
+  .footer-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px; color: var(--white);
+  }
+
+  .footer-logo span { color: var(--gold); }
+
+  .footer-copy { font-size: 12px; color: var(--text-muted); }
+
+  .footer-links { display: flex; gap: 24px; }
+  .footer-links a { font-size: 12px; color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
+  .footer-links a:hover { color: var(--off-white); }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeLeft {
+    from { opacity: 0; transform: translateY(-50%) translateX(40px); }
+    to { opacity: 1; transform: translateY(-50%) translateX(0); }
+  }
+
+  .reveal {
+    opacity: 0; transform: translateY(28px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 1100px) {
+    .inbox-preview { display: none; }
+    nav { padding: 18px 28px; }
+    .hero { padding: 120px 28px 60px; }
+    section { padding: 72px 28px; }
+    .features-grid { grid-template-columns: 1fr; }
+    .pricing-grid { grid-template-columns: 1fr; }
+    .steps { flex-direction: column; gap: 32px; }
+    .steps::before { display: none; }
+    .hero-stats { gap: 28px; flex-wrap: wrap; }
+    footer { flex-direction: column; gap: 20px; text-align: center; }
+    .cta-form { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">Mail<span>Mind</span></div>
+  <ul class="nav-links">
+    <li><a href="#features">Funcionalidades</a></li>
+    <li><a href="#how">Como funciona</a></li>
+    <li><a href="#pricing">Preços</a></li>
+    <li><a href="#cta" class="nav-cta">Começar grátis</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+
+  <div class="hero-tag">Inteligência artificial para email</div>
+
+  <h1>O seu inbox.<br><em>Finalmente</em> sob controlo.</h1>
+
+  <p>MailMind lê, prioriza, responde e faz follow-up por si. Passe menos tempo no email e mais tempo no que realmente importa.</p>
+
+  <div class="hero-actions">
+    <a href="#cta" class="btn-primary">Experimentar grátis — 14 dias</a>
+    <a href="#how" class="btn-ghost">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16" fill="currentColor" stroke="none"/></svg>
+      Ver como funciona
+    </a>
+  </div>
+
+  <div class="hero-stats">
+    <div>
+      <div class="stat-num">4.1<span>h</span></div>
+      <div class="stat-label">gastas em email por dia</div>
+    </div>
+    <div>
+      <div class="stat-num">25<span>%</span></div>
+      <div class="stat-label">redução no tempo de gestão</div>
+    </div>
+    <div>
+      <div class="stat-num">$8.9<span>B</span></div>
+      <div class="stat-label">mercado global em 2035</div>
+    </div>
+  </div>
+
+  <!-- Inbox preview -->
+  <div class="inbox-preview">
+    <div class="inbox-header">
+      <span class="inbox-title">Inbox — ordenado por prioridade</span>
+      <span class="inbox-badge">12 novos</span>
+    </div>
+    <div class="inbox-item active">
+      <div class="priority-dot p-red"></div>
+      <div style="flex:1; min-width:0;">
+        <div class="inbox-sender">Sarah Chen</div>
+        <div class="inbox-subject">Aprovação orçamento Q3 — urgente</div>
+      </div>
+      <div class="ai-chip">URGENTE</div>
+    </div>
+    <div class="inbox-item">
+      <div class="priority-dot p-red"></div>
+      <div style="flex:1; min-width:0;">
+        <div class="inbox-sender">David Okafor</div>
+        <div class="inbox-subject">Escalada cliente: Acme Corp</div>
+      </div>
+      <div class="ai-chip">AÇÃO</div>
+    </div>
+    <div class="inbox-item">
+      <div class="priority-dot p-amber"></div>
+      <div style="flex:1; min-width:0;">
+        <div class="inbox-sender">Agenda da Equipa</div>
+        <div class="inbox-subject">Convite: Reunião estratégia Qui 14h</div>
+      </div>
+      <div class="ai-chip">REUNIÃO</div>
+    </div>
+    <div class="inbox-item">
+      <div class="priority-dot p-amber"></div>
+      <div style="flex:1; min-width:0;">
+        <div class="inbox-sender">Priya Nair</div>
+        <div class="inbox-subject">Re: Feedback da proposta</div>
+      </div>
+    </div>
+    <div class="inbox-item">
+      <div class="priority-dot p-green"></div>
+      <div style="flex:1; min-width:0;">
+        <div class="inbox-sender">Substack Digest</div>
+        <div class="inbox-subject">A sua lista de leitura semanal</div>
+      </div>
+    </div>
+    <div class="ai-summary-bar">
+      ✦ Resumo IA — Sarah precisa de aprovação antes das 11h para não perder a taxa acordada com o fornecedor ($42k).
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="reveal">
+    <div class="section-tag">Funcionalidades</div>
+    <h2 class="section-title">Tudo o que o seu inbox precisa</h2>
+    <p class="section-sub">Da priorização à resposta automática — o MailMind fecha o ciclo completo para si.</p>
+  </div>
+
+  <div class="features-grid reveal">
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </div>
+      <div class="feature-title">Priorização inteligente</div>
+      <p class="feature-desc">O MailMind analisa remetente, contexto e urgência para ordenar o inbox do mais crítico ao menos relevante — automaticamente.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+      </div>
+      <div class="feature-title">Respostas redigidas por IA</div>
+      <p class="feature-desc">Cada email recebe uma proposta de resposta no seu tom de voz. Revê, edita e envia — ou deixa o MailMind tratar de tudo.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+      </div>
+      <div class="feature-title">Follow-ups automáticos</div>
+      <p class="feature-desc">Nunca mais deixe um email sem resposta. O MailMind detecta conversas pendentes e lança follow-ups no timing certo.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8zM6 1v3M10 1v3M14 1v3"/></svg>
+      </div>
+      <div class="feature-title">Cancelar subscrições</div>
+      <p class="feature-desc">O MailMind identifica newsletters e listas que já não lê e trata do processo de cancelamento em seu nome.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      </div>
+      <div class="feature-title">Chatbot integrado</div>
+      <p class="feature-desc">Comunique com o MailMind em linguagem natural: "Resume os emails do cliente X" ou "Mostra o que precisa de resposta hoje".</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      </div>
+      <div class="feature-title">Integração com as suas ferramentas</div>
+      <p class="feature-desc">Gmail, Outlook, Salesforce, HubSpot, Notion e mais. O MailMind encaixa no seu workflow sem fricção.</p>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how" class="how-section">
+  <div class="reveal" style="text-align: center;">
+    <div class="section-tag">Como funciona</div>
+    <h2 class="section-title">Configurado em 3 minutos</h2>
+    <p class="section-sub" style="margin: 0 auto;">Sem migrações complicadas. O MailMind liga ao seu email existente e começa a trabalhar imediatamente.</p>
+  </div>
+
+  <div class="steps reveal">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-title">Liga o seu email</div>
+      <p class="step-desc">Autentica a sua conta Gmail ou Outlook com um clique. Sem configurações complexas.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-title">A IA aprende o seu estilo</div>
+      <p class="step-desc">Em 24h, o MailMind analisa os seus padrões de escrita e define as suas prioridades.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-title">Inbox sob controlo</div>
+      <p class="step-desc">Receba um briefing diário e deixe o MailMind tratar do trabalho repetitivo.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-title">Mantenha o controlo</div>
+      <p class="step-desc">Aprova, edita ou delega — cada ação do MailMind pode ser revista antes de ser executada.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="reveal" style="text-align: center;">
+    <div class="section-tag">Preços</div>
+    <h2 class="section-title">Simples e transparente</h2>
+    <p class="section-sub" style="margin: 0 auto;">Comece grátis. Escale quando precisar.</p>
+  </div>
+
+  <div class="pricing-grid reveal">
+
+    <div class="price-card">
+      <div class="price-tier">Gratuito</div>
+      <div class="price-amount"><sup>€</sup>0</div>
+      <div class="price-period">para sempre</div>
+      <ul class="price-features">
+        <li>Até 50 emails/mês com IA</li>
+        <li>Priorização básica</li>
+        <li>Resumos de thread</li>
+        <li>Gmail e Outlook</li>
+      </ul>
+      <a href="#cta" class="price-btn outline">Começar grátis</a>
+    </div>
+
+    <div class="price-card featured">
+      <div class="price-badge">Mais popular</div>
+      <div class="price-tier">Pro</div>
+      <div class="price-amount"><sup>€</sup>22</div>
+      <div class="price-period">por mês · faturado anualmente</div>
+      <ul class="price-features">
+        <li>Emails ilimitados com IA</li>
+        <li>Respostas redigidas no seu tom</li>
+        <li>Follow-ups automáticos</li>
+        <li>Gestão de subscrições</li>
+        <li>Chatbot integrado</li>
+        <li>Integrações CRM</li>
+      </ul>
+      <a href="checkout.html?plano=pro" class="price-btn solid">Experimentar 14 dias grátis</a>
+    </div>
+
+    <div class="price-card">
+      <div class="price-tier">Equipa</div>
+      <div class="price-amount"><sup>€</sup>38</div>
+      <div class="price-period">por utilizador/mês · faturado anualmente</div>
+      <ul class="price-features">
+        <li>Tudo do plano Pro</li>
+        <li>Inbox partilhado com IA</li>
+        <li>Painel de equipa</li>
+        <li>Análise de produtividade</li>
+        <li>Suporte prioritário</li>
+        <li>SSO e gestão de acessos</li>
+      </ul>
+      <a href="checkout.html?plano=equipa" class="price-btn outline">Subscrever plano Equipa</a>
+    </div>
+
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="cta">
+  <div class="section-tag reveal">Acesso antecipado</div>
+  <h2 class="section-title reveal">Pronto para recuperar<br>o seu tempo?</h2>
+  <p class="section-sub reveal">Junte-se à lista de espera e seja dos primeiros a testar o MailMind. Os primeiros 500 utilizadores têm o plano Pro grátis durante 3 meses.</p>
+
+  <form class="cta-form reveal" onsubmit="handleSubmit(event)">
+    <input type="email" class="cta-input" placeholder="O seu email de trabalho" required id="emailInput">
+    <button type="submit" class="cta-submit">Entrar na lista ↗</button>
+  </form>
+  <p class="cta-note reveal">Sem cartão de crédito. Sem spam. Cancela a qualquer momento.</p>
+
+  <div id="success-msg" style="display:none; color: #52c97a; font-size: 15px; margin-top: 16px; font-weight: 500;">
+    ✓ Está na lista! Entraremos em contacto em breve.
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Mail<span>Mind</span></div>
+  <div class="footer-links">
+    <a href="#">Privacidade</a>
+    <a href="#">Termos</a>
+    <a href="#">Segurança</a>
+    <a href="#">Contacto</a>
+  </div>
+  <div class="footer-copy">© 2026 MailMind. Todos os direitos reservados.</div>
+</footer>
+
+<script>
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 80);
+      }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => observer.observe(el));
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    document.querySelector('.cta-form').style.display = 'none';
+    document.getElementById('success-msg').style.display = 'block';
+  }
+</script>
+
+</body>
+</html>
